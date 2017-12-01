@@ -92,9 +92,8 @@ class VehicleRoute(val capacity: Int, val distances: Array<Array<Int>>) {
         val newDistance = distances[customers[i - 1].index][customers[i + 1].index]
 
         totalDemand -= customers[i].demand
+        totalDistance += (newDistance - previousDistance)
 
         customers.removeAt(i)
-
-        totalDistance += (newDistance - previousDistance)
     }
 }

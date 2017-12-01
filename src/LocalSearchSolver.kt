@@ -25,9 +25,12 @@ class VehicleRoutingSolver(problem: VehicleRoutingProblem, solution: VehicleRout
 
     val relocate = RelocateSolver(problem, solution)
     val tsp = TSPSolver(problem, solution)
+    val swap = SwapSolver(problem, solution)
 
     override fun iteration(): Boolean {
-        return relocate.optimize() || tsp.optimize()
+        return relocate.optimize()
+               || tsp.optimize()
+               // || swap.optimize()
     }
 
 }
@@ -60,6 +63,8 @@ class TSPSolver(problem: VehicleRoutingProblem, solution: VehicleRoutingSolution
     }
 
 }
+
+
 
 class RelocateSolver(problem: VehicleRoutingProblem, solution: VehicleRoutingSolution) : LocalSearchSolver(problem, solution) {
     override fun iteration(): Boolean {
@@ -132,6 +137,101 @@ class RelocateSolver(problem: VehicleRoutingProblem, solution: VehicleRoutingSol
         // Undo relocate
         route.addCustomer(route2.customers[j], i)
         route2.removeCustomer(j)
+
+        return newDistance - previousDistance
+    }
+}
+
+
+class SwapSolver(problem: VehicleRoutingProblem, solution: VehicleRoutingSolution) : LocalSearchSolver(problem, solution) {
+    override fun iteration(): Boolean {
+
+        var bestRouteFrom: VehicleRoute? = null
+        var bestRouteTo: VehicleRoute? = null
+        var bestDelta = 0
+        var bestCustomerFrom = 0
+        var bestCustomerTo = 0
+
+        for (routeFrom in solution.routes) {
+            for (routeTo in solution.routes) {
+                if (routeFrom != routeTo) {
+                    for (i in 1 until routeFrom.customers.size - 1) {
+                        for (j in 1 until (routeTo.customers.size - 1)) {
+                            val delta = swapDelta(routeFrom, i, routeTo, j)
+                            if (delta < bestDelta) {
+                                bestDelta = delta
+                                bestRouteFrom = routeFrom
+                                bestRouteTo = routeTo
+                                bestCustomerFrom = i
+                                bestCustomerTo = j
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (bestRouteFrom != null && bestRouteTo != null) {
+            swap(bestRouteFrom, bestCustomerFrom, bestRouteTo, bestCustomerTo)
+        }
+
+        return bestDelta < 0
+    }
+
+
+    // Relocate a customer
+    fun swap(route: VehicleRoute, i: Int, route2: VehicleRoute, j: Int) {
+
+        val sizeA = route.customers.size
+        val sizeB = route2.customers.size
+        val customerToRelocate = route.customers[i]
+        val customerToRelocate2 = route2.customers[j]
+
+        route.removeCustomer(i)
+        route.addCustomer(customerToRelocate2, i)
+
+        route2.removeCustomer(j)
+        route2.addCustomer(customerToRelocate, j)
+
+        assert(sizeA == route.customers.size)
+        assert(sizeB == route2.customers.size)
+    }
+
+
+    /**
+     * A -> B -> C
+     * D -> E
+     * A -> C
+     * D -> B -> E
+     */
+    fun swapDelta(route: VehicleRoute, i: Int, route2: VehicleRoute, j: Int): Int {
+
+        assert(i < route.customers.size - 1)
+        assert(j < route2.customers.size - 1)
+
+
+        // Check if the demand is not violated first
+        if (problem.capacity < route.customers[i].demand + route2.totalDemand ||
+            problem.capacity < route2.customers[j].demand + route.totalDemand) {
+            return 0
+        }
+
+        val previousDistance = route.totalDistance + route2.totalDistance
+
+        val sizeA = route.customers.size
+        val sizeB = route2.customers.size
+
+        // Apply swap
+        swap(route, i, route2, j)
+
+        val newDistance = route.totalDistance + route2.totalDistance
+
+        // Undo swap
+        swap(route, i, route2, j)
+
+        assert(sizeA == route.customers.size)
+        assert(sizeB == route2.customers.size)
+
 
         return newDistance - previousDistance
     }
