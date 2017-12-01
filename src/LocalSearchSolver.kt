@@ -113,27 +113,26 @@ class RelocateSolver(problem: VehicleRoutingProblem, solution: VehicleRoutingSol
      */
     fun relocateDelta(route: VehicleRoute, i: Int, route2: VehicleRoute, j: Int): Int {
 
+        assert(i < route.customers.size - 1)
+
+
         // Check if the demand is not violated first
         if (problem.capacity < route.customers[i].demand + route2.totalDemand) {
             return 0
         }
 
-        val distances = problem.distances
+        val previousDistance = route.totalDistance + route2.totalDistance
 
-        val left = i - 1
-        val right = i + 1
+        // Apply relocate
+        route2.addCustomer(route.customers[i], j)
+        route.removeCustomer(i)
 
-        // Distance A -> B -> C
-        val previousDistance = distances[route.customers[left].index][route.customers[i].index] +
-                distances[route.customers[i].index][route.customers[right].index]
-        // Distance A -> C
-        val newDistance = distances[route.customers[left].index][route.customers[right].index]
+        val newDistance = route.totalDistance + route2.totalDistance
 
-        val route2PreviousDistance = distances[route2.customers[j - 1].index][route2.customers[j].index]
-        val route2NewDistance = distances[route2.customers[j - 1].index][route.customers[i].index] +
-                distances[route.customers[i].index][route2.customers[j].index]
+        // Undo relocate
+        route.addCustomer(route2.customers[j], i)
+        route2.removeCustomer(j)
 
-
-        return newDistance + route2NewDistance - previousDistance - route2PreviousDistance
+        return newDistance - previousDistance
     }
 }
