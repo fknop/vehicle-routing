@@ -1,3 +1,5 @@
+package vrp
+
 fun computeDistances(x: List<Double>, y: List<Double>): Array<Array<Int>> {
     assert(x.size == y.size)
 

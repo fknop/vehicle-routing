@@ -1,8 +1,30 @@
+package vrp
+
+import vrp.Customer
+
 class VehicleRoute(val capacity: Int, val distances: Array<Array<Int>>) {
 
     val customers = mutableListOf<Customer>()
     var totalDemand = 0
     var totalDistance = 0
+
+    val size: Int
+        get() = customers.size
+
+    inline operator fun get(index: Int): Customer {
+        return customers[index]
+    }
+
+    inline operator fun iterator(): Iterator<Customer> {
+        return customers.iterator()
+    }
+
+    inline fun forEach(block: (Customer) -> Unit) {
+        var index = 0
+        while (index < size) {
+            block(get(index++))
+        }
+    }
 
     fun addCustomer(customer: Customer): Boolean {
 
@@ -44,43 +66,6 @@ class VehicleRoute(val capacity: Int, val distances: Array<Array<Int>>) {
         }
 
         return true
-    }
-
-    fun twoOpt(i: Int, j: Int) {
-        val left = minOf(i, j)
-        val right = maxOf(i, j)
-
-        assert(left >= 0)
-        assert(right < customers.size)
-
-        totalDistance += deltaTwoOpt(i, j)
-
-        val n = (right - left + 1) / 2
-        var k = 0
-        while (k < n) {
-            // Swap edges
-            val tmp = customers[left + 1 + k]
-            customers[left + 1 + k] = customers[right - k]
-            customers[right - k] = tmp
-            ++k
-        }
-    }
-
-    fun deltaTwoOpt(i: Int, j: Int): Int {
-        val left = minOf(i, j)
-        val right = maxOf(i, j)
-
-        assert(left >= 0)
-        assert(right < customers.size - 1)
-
-        val distanceLeft = distances[customers[left].index][customers[left + 1].index]
-        val distanceRight = distances[customers[right].index][customers[right + 1].index]
-
-        val newDistanceLeft = distances[customers[left].index][customers[right].index]
-        val newDistanceRight = distances[customers[left + 1].index][customers[right + 1].index]
-
-
-        return newDistanceLeft + newDistanceRight - distanceLeft - distanceRight
     }
 
     fun removeCustomer(i: Int) {
