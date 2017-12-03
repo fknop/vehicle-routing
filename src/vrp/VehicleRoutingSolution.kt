@@ -1,11 +1,13 @@
 package vrp
 
+import localsearch.Neighbor
 import vrp.operators.*
 import java.util.*
 
-class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: MutableList<VehicleRoute>) {
+class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: MutableList<VehicleRoute>, val seed: Long = 0L) {
 
-    val rand = Random(0)
+    val rand = Random(seed)
+    var copies = 0
 
     val totalDistance: Int
         get() = routes.sumBy { it.totalDistance }
@@ -34,19 +36,20 @@ class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: Mut
             routes += it.copy()
         }
 
-        return VehicleRoutingSolution(problem, routes)
+        copies += 1
+        return VehicleRoutingSolution(problem, routes, seed + copies)
     }
 
-    fun perturb(hard: Boolean = false, reallyhard: Boolean = false) {
+    fun perturb(hard: Boolean = false, reallyhard: Boolean = false, reallyreallyhard: Boolean = false) {
 
-        val swaps = if (reallyhard) 20 else if (hard) 10 else  5
+        val swaps =
+                if (reallyreallyhard) 10
+                else if (reallyhard) 5
+                else if (hard) 2
+                else 1
 
         for (i in 0 until swaps) {
-            val neighbors = SwapOperator(problem, this).neighborhood() +
-                            RelocateOperator(problem, this).neighborhood() +
-                            IntraRelocateOperator(problem, this).neighborhood() +
-                            InterTwoOptOperator(problem, this).neighborhood() +
-                            TwoOptOperator(problem, this).neighborhood()
+            var neighbors = InterTwoOptOperator(problem, this).neighborhood()
 
             val r = rand.nextInt(neighbors.size)
             neighbors[r]()

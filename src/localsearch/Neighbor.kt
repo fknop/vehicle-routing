@@ -1,12 +1,12 @@
 package localsearch
 
-data class Neighbor(private val deltaFn: () -> Int, private val applyFn: () -> Unit) {
+data class Neighbor(val deltaFn: () -> Int, val applyFn: () -> Unit) {
 
-    private var invoked = false
+    var invoked = false
 
     val delta: Int by lazy { deltaFn() }
 
-    operator fun invoke() {
+    inline operator fun invoke() {
         assert(!invoked)
         invoked = true
         applyFn()
