@@ -158,47 +158,61 @@ fun VehicleRoute.deltaTwoOpt(i: Int, j: Int): Int {
     return newDistanceLeft + newDistanceRight - distanceLeft - distanceRight
 }
 
-fun interDeltaTwoOpt(distances: Array<Array<Int>>, routeFrom: VehicleRoute, i: Int, routeTo: VehicleRoute, j: Int): Int {
-    val left = i
-    val right = j
+fun interDeltaTwoOpt(distances: Array<Array<Int>>, routeLeft: VehicleRoute, i: Int, routeRight: VehicleRoute, j: Int): Int {
+//    val left = i
+//    val right = j
+//
+//    val distanceLeft = distances[routeFrom[left].index][routeFrom[left + 1].index]
+//    val distanceRight = distances[routeTo[right].index][routeTo[right + 1].index]
+//
+//    val newDistanceLeft = distances[routeFrom[left].index][routeTo[right].index]
+//    val newDistanceRight = distances[routeFrom[left + 1].index][routeTo[right + 1].index]
+//
+//    return newDistanceLeft + newDistanceRight - distanceLeft - distanceRight
 
-    val distanceLeft = distances[routeFrom[left].index][routeFrom[left + 1].index]
-    val distanceRight = distances[routeTo[right].index][routeTo[right + 1].index]
+    val previousDistance = routeLeft.totalDistance + routeRight.totalDistance
 
-    val newDistanceLeft = distances[routeFrom[left].index][routeTo[right].index]
-    val newDistanceRight = distances[routeFrom[left + 1].index][routeTo[right + 1].index]
+    val strLeft = routeLeft.toString()
+    val strRight = routeRight.toString()
+    val leftSize = routeLeft.size
 
-    return newDistanceLeft + newDistanceRight - distanceLeft - distanceRight
+
+    interTwoOpt(routeLeft, i, routeRight, j)
+
+    val newDistance = routeLeft.totalDistance + routeRight.totalDistance
+
+
+    interTwoOpt(routeLeft, i, routeRight, leftSize - i - 2)
+
+    assert(strLeft == routeLeft.toString())
+    assert(strRight == routeRight.toString())
+
+
+    return newDistance - previousDistance
 }
 
 
 fun interTwoOpt(routeLeft: VehicleRoute, i: Int, routeRight: VehicleRoute, j: Int) {
 
-
     // Remove left + 1 -> n
     // left + 1 -> n becomes right -> n
     //
+    val copyLeft = routeLeft.copy()
+    val copyRight = routeRight.copy()
 
-    val customersLeft = mutableListOf<Customer>()
-    for (left in 0..i) {
-        customersLeft += routeLeft[left]
+    for (left in i+1 until copyLeft.size - 1) {
+        routeLeft.removeCustomer(i + 1)
     }
 
-    for (right in j..0) {
-        customersLeft += routeRight[right]
-    }
-
-    val customersRight = mutableListOf<Customer>()
-
-    for (left in routeLeft.size - 1..i + 1) {
-        customersRight += routeLeft[left]
-    }
-
-    for (right in j + 1..routeRight.size) {
-        customersRight += routeRight[right]
+    for (right in j downTo 1) {
+        routeRight.removeCustomer(1)
+        val t = routeLeft.addCustomer(copyRight[right], routeLeft.size - 1)
+        assert(t)
     }
 
 
-    // TO BE CONTINUED.
-
+    for (left in i+1 until copyLeft.size - 1) {
+        val t = routeRight.addCustomer(copyLeft[left], 1)
+        assert(t)
+    }
 }

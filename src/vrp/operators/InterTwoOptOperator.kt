@@ -14,16 +14,20 @@ class InterTwoOptOperator(val problem: VehicleRoutingProblem, val solution: Vehi
             for (j in i + 1 until solution.size) {
                 val routeRight = solution[j]
                 if (routeLeft != routeRight) {
-                    for (left in 1 until routeLeft.size - 2) {
-                        for (right in 1 until routeRight.size - 2) {
-                            // left + 1 goes to routeRight
-                            // right goes to routeLeft
+                    for (left in 1 until routeLeft.size - 1) {
+                        for (right in 1 until routeRight.size - 1) {
 
-                            if (problem.capacity < routeLeft.totalDemand + routeRight[right].demand - routeLeft[left + 1].demand) {
+                            // demand left + 1 -> n goes to route2
+                            // demand right -1 -> 0 goes to route 1
+                            val demandToRight = routeLeft.customers.subList(left + 1, routeLeft.size).sumBy { it.demand }
+                            val demandToLeft = routeRight.customers.subList(0, right + 1).sumBy { it.demand }
+
+
+                            if (problem.capacity < routeLeft.totalDemand + demandToLeft - demandToRight) {
                                 continue
                             }
 
-                            if (problem.capacity < routeRight.totalDemand + routeLeft[left + 1].demand - routeRight[right].demand) {
+                            if (problem.capacity < routeRight.totalDemand + demandToRight - demandToLeft) {
                                 continue
                             }
 

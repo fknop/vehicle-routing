@@ -1,8 +1,6 @@
 package vrp
 
-import vrp.operators.IntraRelocateOperator
-import vrp.operators.RelocateOperator
-import vrp.operators.SwapOperator
+import vrp.operators.*
 import java.util.*
 
 class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: MutableList<VehicleRoute>) {
@@ -39,31 +37,33 @@ class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: Mut
         return VehicleRoutingSolution(problem, routes)
     }
 
-    fun perturb() {
+    fun perturb(hard: Boolean = false, reallyhard: Boolean = false) {
 
-        val swaps = 5
+        val swaps = if (reallyhard) 20 else if (hard) 10 else  5
 
         for (i in 0 until swaps) {
             val neighbors = SwapOperator(problem, this).neighborhood() +
                             RelocateOperator(problem, this).neighborhood() +
-                            IntraRelocateOperator(problem, this).neighborhood()
+                            IntraRelocateOperator(problem, this).neighborhood() +
+                            InterTwoOptOperator(problem, this).neighborhood() +
+                            TwoOptOperator(problem, this).neighborhood()
 
             val r = rand.nextInt(neighbors.size)
             neighbors[r]()
         }
     }
 
-    fun check(distances: Array<Array<Int>>, capacity: Int): Boolean {
+    fun check(): Boolean {
         var valid = true
         this.forEach {
             var checkedDistance = 0
             for (i in 1 until it.customers.size) {
                 val previousIndex = it.customers[i - 1].index
                 val index = it.customers[i].index
-                checkedDistance += (distances[previousIndex][index])
+                checkedDistance += (problem.distances[previousIndex][index])
             }
 
-            valid = valid && (it.totalDemand <= capacity)
+            valid = valid && (it.totalDemand <= problem.capacity)
             valid = valid && (it.totalDistance == checkedDistance)
         }
 
