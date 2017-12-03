@@ -1,6 +1,5 @@
 package localsearch
 
-import printMultiple
 import vrp.VehicleRoutingProblem
 import vrp.VehicleRoutingSolution
 import java.util.*
@@ -48,10 +47,10 @@ abstract class SimulatedAnnealingSolver(val problem: VehicleRoutingProblem, val 
         }
     }
 
-    fun next(): Successor {
+    fun next(): Neighbor {
         val successors = successors()
         return successors[rand.nextInt(successors.size)]
     }
 
-    abstract fun successors(): List<Successor>
+    abstract fun successors(): List<Neighbor>
 }

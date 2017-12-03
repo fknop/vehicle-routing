@@ -1,5 +1,6 @@
 package vrp
 
+import java.util.*
 import kotlin.math.*
 
 fun radians(angle: Double): Double {
@@ -89,7 +90,7 @@ class SweepStrategy : InitialSolutionStrategy {
 
         assert(customers.size == servedCustomers.size)
 
-        return VehicleRoutingSolution(routes)
+        return VehicleRoutingSolution(problem, routes)
     }
 }
 
@@ -126,7 +127,7 @@ class SimpleInitialStrategy : InitialSolutionStrategy {
         }
 
 
-        return VehicleRoutingSolution(routes)
+        return VehicleRoutingSolution(problem, routes)
     }
 }
 

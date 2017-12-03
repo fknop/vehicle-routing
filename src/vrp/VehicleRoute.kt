@@ -1,7 +1,5 @@
 package vrp
 
-import vrp.Customer
-
 class VehicleRoute(val capacity: Int, val distances: Array<Array<Int>>) {
 
     val customers = mutableListOf<Customer>()
@@ -24,6 +22,15 @@ class VehicleRoute(val capacity: Int, val distances: Array<Array<Int>>) {
         while (index < size) {
             block(get(index++))
         }
+    }
+
+    fun copy(): VehicleRoute {
+        val route = VehicleRoute(capacity, distances)
+        forEach {
+            route.addCustomer(it)
+        }
+
+        return route
     }
 
     fun addCustomer(customer: Customer): Boolean {
@@ -68,7 +75,7 @@ class VehicleRoute(val capacity: Int, val distances: Array<Array<Int>>) {
         return true
     }
 
-    fun removeCustomer(i: Int) {
+    fun removeCustomer(i: Int): Customer {
 
         assert(i > 0)
         assert(i < customers.size - 1)
@@ -79,6 +86,15 @@ class VehicleRoute(val capacity: Int, val distances: Array<Array<Int>>) {
         totalDemand -= customers[i].demand
         totalDistance += (newDistance - previousDistance)
 
-        customers.removeAt(i)
+        return customers.removeAt(i)
+    }
+
+    override fun toString(): String {
+        return buildString {
+            this@VehicleRoute.forEach {
+                append(it.index)
+                append(" ")
+            }
+        }
     }
 }

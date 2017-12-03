@@ -16,9 +16,9 @@ abstract class HillClimbingSolver(val problem: VehicleRoutingProblem, val soluti
     }
 
     fun next(): Boolean {
-        val successors = successors()
-        if (successors.isNotEmpty()) {
-            val best = successors().minBy { it.delta }!!
+        val neighbors = neighborhood()
+        if (neighbors.isNotEmpty()) {
+            val best = neighborhood().minBy { it.delta }!!
 
             if (best.delta < 0) {
                 best()
@@ -30,5 +30,5 @@ abstract class HillClimbingSolver(val problem: VehicleRoutingProblem, val soluti
         return false
     }
 
-    abstract fun successors(): List<Successor>
+    abstract fun neighborhood(): List<Neighbor>
 }

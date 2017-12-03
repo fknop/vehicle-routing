@@ -1,5 +1,5 @@
 import localsearch.SimulatedAnnealingSolver
-import localsearch.Successor
+import localsearch.Neighbor
 import vrp.*
 import vrp.operators.*
 
@@ -11,27 +11,27 @@ class VehicleRoutingSolverSA(problem: VehicleRoutingProblem, solution: VehicleRo
 
     constructor(problem: VehicleRoutingProblem, strategy: InitialSolutionStrategy, seed: Long = 0): this(problem, strategy.getInitialSolution(problem), seed)
 
-    override fun successors(): List<Successor> {
+    override fun successors(): List<Neighbor> {
         return relocate.successors() + tsp.successors() + swap.successors()
     }
 }
 
 class SwapSolverSA(problem: VehicleRoutingProblem, solution: VehicleRoutingSolution) : SimulatedAnnealingSolver(problem, solution) {
-    override fun successors(): List<Successor> {
-        return SwapOperator(problem, solution).successors()
+    override fun successors(): List<Neighbor> {
+        return SwapOperator(problem, solution).neighborhood()
     }
 }
 
 class TSPSolverSA(problem: VehicleRoutingProblem, solution: VehicleRoutingSolution) : SimulatedAnnealingSolver(problem, solution) {
-    override fun successors(): List<Successor> {
-        return TspOperator(problem, solution).successors()
+    override fun successors(): List<Neighbor> {
+        return TwoOptOperator(problem, solution).neighborhood()
     }
 }
 
 
 class RelocateSolverSA(problem: VehicleRoutingProblem, solution: VehicleRoutingSolution) : SimulatedAnnealingSolver(problem, solution) {
-    override fun successors(): List<Successor> {
-        return RelocateOperator(problem, solution).successors()
+    override fun successors(): List<Neighbor> {
+        return RelocateOperator(problem, solution).neighborhood()
     }
 }
 

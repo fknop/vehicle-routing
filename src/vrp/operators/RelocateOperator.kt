@@ -1,13 +1,13 @@
 package vrp.operators
 
 import localsearch.Operator
-import localsearch.Successor
+import localsearch.Neighbor
 import vrp.VehicleRoutingProblem
 import vrp.VehicleRoutingSolution
 
 class RelocateOperator(val problem: VehicleRoutingProblem, val solution: VehicleRoutingSolution): Operator {
-    override fun successors(): List<Successor> {
-        val successors = mutableListOf<Successor>()
+    override fun neighborhood(): List<Neighbor> {
+        val neighbors = mutableListOf<Neighbor>()
 
         for (routeFrom in solution.routes) {
             for (routeTo in solution.routes) {
@@ -19,13 +19,13 @@ class RelocateOperator(val problem: VehicleRoutingProblem, val solution: Vehicle
                                 continue
                             }
 
-                            successors += Successor({ relocateDelta(routeFrom, i, routeTo, j) }, { relocate(routeFrom, i, routeTo, j) })
+                            neighbors += Neighbor({ relocateDelta(routeFrom, i, routeTo, j) }, { relocate(routeFrom, i, routeTo, j) })
                         }
                     }
                 }
             }
         }
 
-        return successors
+        return neighbors
     }
 }

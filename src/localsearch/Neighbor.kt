@@ -1,6 +1,6 @@
 package localsearch
 
-data class Successor (private val deltaFn: () -> Int, private val applyFn: () -> Unit) {
+data class Neighbor(private val deltaFn: () -> Int, private val applyFn: () -> Unit) {
 
     private var invoked = false
 

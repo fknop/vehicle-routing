@@ -1,24 +1,22 @@
-import vrp.SweepStrategy
-import vrp.VehicleRoutingProblem
-import vrp.VehicleRoutingSolution
-import vrp.VehicleRoutingSolver
+import vrp.*
 
 fun main(args: Array<String>) {
 
     val problem = VehicleRoutingProblem.fromFile(args[0])
 
-    val solverSA = VehicleRoutingSolverSA(problem, SweepStrategy())
-    solverSA.optimize()
-    println(solverSA.solution)
-    val solver = VehicleRoutingSolver(problem, solverSA.solution)
-    solver.optimize()
-    val solution = solver.solution
+    var solver = VehicleRoutingSolver(problem, SimpleInitialStrategy())
+    var best: VehicleRoutingSolution? = null
+    for (i in 1..10) {
+        solver.optimize()
+        val solution = solver.solution
+        if (best == null || best.totalDistance > solution.totalDistance) {
+            best = solution.copy()
+        }
 
-    print(solution)
+        solution.perturb()
+    }
 
-
-
-
+    print(best)
 }
 
 fun printMultiple(vararg values: Any) {

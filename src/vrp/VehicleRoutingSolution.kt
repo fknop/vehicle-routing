@@ -1,6 +1,13 @@
 package vrp
 
-class VehicleRoutingSolution(val routes: MutableList<VehicleRoute>) {
+import vrp.operators.IntraRelocateOperator
+import vrp.operators.RelocateOperator
+import vrp.operators.SwapOperator
+import java.util.*
+
+class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: MutableList<VehicleRoute>) {
+
+    val rand = Random(0)
 
     val totalDistance: Int
         get() = routes.sumBy { it.totalDistance }
@@ -20,6 +27,29 @@ class VehicleRoutingSolution(val routes: MutableList<VehicleRoute>) {
         var index = 0
         while (index < size) {
             block(get(index++))
+        }
+    }
+
+    fun copy(): VehicleRoutingSolution {
+        val routes = mutableListOf<VehicleRoute>()
+        forEach {
+            routes += it.copy()
+        }
+
+        return VehicleRoutingSolution(problem, routes)
+    }
+
+    fun perturb() {
+
+        val swaps = 5
+
+        for (i in 0 until swaps) {
+            val neighbors = SwapOperator(problem, this).neighborhood() +
+                            RelocateOperator(problem, this).neighborhood() +
+                            IntraRelocateOperator(problem, this).neighborhood()
+
+            val r = rand.nextInt(neighbors.size)
+            neighbors[r]()
         }
     }
 
