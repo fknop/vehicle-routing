@@ -1,7 +1,5 @@
 package vrp.operators
 
-import printMultiple
-import vrp.Customer
 import vrp.VehicleRoute
 
 /**
@@ -100,7 +98,6 @@ fun swapDelta(route: VehicleRoute, i: Int, route2: VehicleRoute, j: Int): Int {
     assert(j < route2.customers.size - 1)
 
 
-
     val previousDistance = route.totalDistance + route2.totalDistance
 
     val sizeA = route.customers.size
@@ -158,35 +155,18 @@ fun VehicleRoute.deltaTwoOpt(i: Int, j: Int): Int {
     return newDistanceLeft + newDistanceRight - distanceLeft - distanceRight
 }
 
-fun interDeltaTwoOpt(distances: Array<Array<Int>>, routeLeft: VehicleRoute, i: Int, routeRight: VehicleRoute, j: Int): Int {
-//    val left = i
-//    val right = j
-//
-//    val distanceLeft = distances[routeFrom[left].index][routeFrom[left + 1].index]
-//    val distanceRight = distances[routeTo[right].index][routeTo[right + 1].index]
-//
-//    val newDistanceLeft = distances[routeFrom[left].index][routeTo[right].index]
-//    val newDistanceRight = distances[routeFrom[left + 1].index][routeTo[right + 1].index]
-//
-//    return newDistanceLeft + newDistanceRight - distanceLeft - distanceRight
+fun interDeltaTwoOpt(routeLeft: VehicleRoute, i: Int, routeRight: VehicleRoute, j: Int): Int {
 
+    val leftSize = routeLeft.size
     val previousDistance = routeLeft.totalDistance + routeRight.totalDistance
 
-    val strLeft = routeLeft.toString()
-    val strRight = routeRight.toString()
-    val leftSize = routeLeft.size
-
-
+    // Apply
     interTwoOpt(routeLeft, i, routeRight, j)
 
     val newDistance = routeLeft.totalDistance + routeRight.totalDistance
 
-
+    // Undo
     interTwoOpt(routeLeft, i, routeRight, leftSize - i - 2)
-
-    assert(strLeft == routeLeft.toString())
-    assert(strRight == routeRight.toString())
-
 
     return newDistance - previousDistance
 }
@@ -196,7 +176,6 @@ fun interTwoOpt(routeLeft: VehicleRoute, i: Int, routeRight: VehicleRoute, j: In
 
     // Remove left + 1 -> n
     // left + 1 -> n becomes right -> n
-    //
     val copyLeft = routeLeft.copy()
     val copyRight = routeRight.copy()
 
@@ -206,13 +185,11 @@ fun interTwoOpt(routeLeft: VehicleRoute, i: Int, routeRight: VehicleRoute, j: In
 
     for (right in j downTo 1) {
         routeRight.removeCustomer(1)
-        val t = routeLeft.addCustomer(copyRight[right], routeLeft.size - 1)
-        assert(t)
+        routeLeft.addCustomer(copyRight[right], routeLeft.size - 1)
     }
 
 
     for (left in i+1 until copyLeft.size - 1) {
-        val t = routeRight.addCustomer(copyLeft[left], 1)
-        assert(t)
+        routeRight.addCustomer(copyLeft[left], 1)
     }
 }

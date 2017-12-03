@@ -33,7 +33,7 @@ class InterTwoOptOperator(val problem: VehicleRoutingProblem, val solution: Vehi
 
 
                             neighbors += Neighbor(
-                                    { interDeltaTwoOpt(problem.distances, routeLeft, left, routeRight, right) },
+                                    { interDeltaTwoOpt(routeLeft, left, routeRight, right) },
                                     { interTwoOpt(routeLeft, left, routeRight, right) }
                             )
                         }
