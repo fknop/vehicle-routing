@@ -14,15 +14,14 @@ fun relocateDelta(routeFrom: VehicleRoute, i: Int, routeTo: VehicleRoute, j: Int
 
     val previousDistance = routeFrom.totalDistance + routeTo.totalDistance
 
+    val routeToCopy = routeTo.copy()
+    val routeFromCopy = routeFrom.copy()
+
     // Apply relocate
-    routeTo.addCustomer(routeFrom.customers[i], j)
-    routeFrom.removeCustomer(i)
+    routeToCopy.addCustomer(routeFromCopy.customers[i], j)
+    routeFromCopy.removeCustomer(i)
 
-    val newDistance = routeFrom.totalDistance + routeTo.totalDistance
-
-    // Undo relocate
-    routeFrom.addCustomer(routeTo[j], i)
-    routeTo.removeCustomer(j)
+    val newDistance = routeFromCopy.totalDistance + routeToCopy.totalDistance
 
     return newDistance - previousDistance
 }
@@ -92,27 +91,28 @@ fun swap(routeFrom: VehicleRoute, i: Int, routeTo: VehicleRoute, j: Int) {
  * A -> C
  * D -> B -> E
  */
-fun swapDelta(route: VehicleRoute, i: Int, route2: VehicleRoute, j: Int): Int {
+fun swapDelta(routeFrom: VehicleRoute, i: Int, routeTo: VehicleRoute, j: Int): Int {
 
-    assert(i < route.customers.size - 1)
-    assert(j < route2.customers.size - 1)
+    assert(i < routeFrom.customers.size - 1)
+    assert(j < routeTo.customers.size - 1)
 
 
-    val previousDistance = route.totalDistance + route2.totalDistance
+    val previousDistance = routeFrom.totalDistance + routeTo.totalDistance
 
-    val sizeA = route.customers.size
-    val sizeB = route2.customers.size
+
+    val sizeA = routeFrom.customers.size
+    val sizeB = routeTo.customers.size
+
+    val routeFromCopy = routeFrom.copy()
+    val routeToCopy = routeTo.copy()
 
     // Apply vrp.operators.swap
-    swap(route, i, route2, j)
+    swap(routeFromCopy, i, routeToCopy, j)
 
-    val newDistance = route.totalDistance + route2.totalDistance
+    val newDistance = routeFromCopy.totalDistance + routeToCopy.totalDistance
 
-    // Undo vrp.operators.swap
-    swap(route, i, route2, j)
-
-    assert(sizeA == route.customers.size)
-    assert(sizeB == route2.customers.size)
+    assert(sizeA == routeFrom.customers.size)
+    assert(sizeB == routeTo.customers.size)
 
 
     return newDistance - previousDistance
@@ -157,16 +157,14 @@ fun VehicleRoute.deltaTwoOpt(i: Int, j: Int): Int {
 
 fun interDeltaTwoOpt(routeLeft: VehicleRoute, i: Int, routeRight: VehicleRoute, j: Int): Int {
 
-    val leftSize = routeLeft.size
     val previousDistance = routeLeft.totalDistance + routeRight.totalDistance
+    val routeLeftCopy = routeLeft.copy()
+    val routeRightCopy = routeRight.copy()
 
     // Apply
-    interTwoOpt(routeLeft, i, routeRight, j)
+    interTwoOpt(routeLeftCopy, i, routeRightCopy, j)
 
-    val newDistance = routeLeft.totalDistance + routeRight.totalDistance
-
-    // Undo
-    interTwoOpt(routeLeft, i, routeRight, leftSize - i - 2)
+    val newDistance = routeLeftCopy.totalDistance + routeRightCopy.totalDistance
 
     return newDistance - previousDistance
 }

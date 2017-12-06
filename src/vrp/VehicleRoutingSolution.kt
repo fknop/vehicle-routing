@@ -40,16 +40,12 @@ class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: Mut
         return VehicleRoutingSolution(problem, routes, seed + copies)
     }
 
-    fun perturb(hard: Boolean = false, reallyhard: Boolean = false, reallyreallyhard: Boolean = false) {
-
-        val swaps =
-                if (reallyreallyhard) 10
-                else if (reallyhard) 5
-                else if (hard) 2
-                else 1
+    fun perturb(swaps: Int = 1) {
 
         for (i in 0 until swaps) {
-            var neighbors = InterTwoOptOperator(problem, this).neighborhood()
+            val neighbors = InterTwoOptOperator(problem, this).neighborhood() +
+                            SwapOperator(problem, this).neighborhood() +
+                            RelocateOperator(problem, this).neighborhood()
 
             val r = rand.nextInt(neighbors.size)
             neighbors[r]()
@@ -69,6 +65,9 @@ class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: Mut
             valid = valid && (it.totalDemand <= problem.capacity)
             valid = valid && (it.totalDistance == checkedDistance)
         }
+
+        valid = valid && problem.k == this.size
+        valid = valid && problem.customers.size - 1 == this.routes.sumBy { it.size - 2 }
 
         return valid
     }

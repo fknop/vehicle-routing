@@ -131,11 +131,11 @@ class SimpleInitialStrategy : InitialSolutionStrategy {
     }
 }
 
-class RandomInitialStrategy : InitialSolutionStrategy {
+class RandomInitialStrategy(val seed: Long = 0) : InitialSolutionStrategy {
     override fun getInitialSolution(problem: VehicleRoutingProblem): VehicleRoutingSolution {
         val customers = problem.customers
                 .subList(1, problem.customers.size) // remove warehouse
-                .shuffled(Random(0))
+                .shuffled(Random(seed))
 
         val routes = MutableList(problem.k) {
             val route = VehicleRoute(problem.capacity, problem.distances)
