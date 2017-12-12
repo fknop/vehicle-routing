@@ -22,6 +22,7 @@ abstract class HillClimbingSolver(val problem: VehicleRoutingProblem, val soluti
 
             if (best.delta < 0) {
                 best()
+                solution.tabu += solution.totalDistance
             }
 
             return best.delta < 0

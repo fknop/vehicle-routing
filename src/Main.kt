@@ -7,8 +7,12 @@ import vrp.*
 fun main(args: Array<String>) {
 
     val problem = VehicleRoutingProblem.fromFile(args[0])
-    val ils = ILSSearch(problem, restarts = 1, maxstuck = 200, maxtime = Long.MAX_VALUE, randomStart = true)
-    print(ils.search())
+    val maxtime = 290000L
+    val restarts = 100
+    val ils = ILSSearch(problem, restarts = restarts, maxstuck = 10, maxtime = maxtime / (restarts + 1), randomStart = true)
+    val (time, solution) = ils.search()
+    println(time)
+    println(solution)
 }
 
 fun printMultiple(vararg values: Any) {

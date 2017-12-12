@@ -12,7 +12,7 @@ interface InitialSolutionStrategy {
     fun getInitialSolution(problem: VehicleRoutingProblem): VehicleRoutingSolution
 }
 
-class SweepStrategy : InitialSolutionStrategy {
+class SweepStrategy(val seed: Long = 0L) : InitialSolutionStrategy {
     override fun getInitialSolution(problem: VehicleRoutingProblem): VehicleRoutingSolution {
 
         val customers = problem.customers.subList(1, problem.customers.size) // remove warehouse
@@ -90,7 +90,7 @@ class SweepStrategy : InitialSolutionStrategy {
 
         assert(customers.size == servedCustomers.size)
 
-        return VehicleRoutingSolution(problem, routes)
+        return VehicleRoutingSolution(problem, routes, seed = seed)
     }
 }
 
@@ -165,7 +165,7 @@ class RandomInitialStrategy(val seed: Long = 0) : InitialSolutionStrategy {
         }
 
 
-        return VehicleRoutingSolution(problem = problem, routes = routes)
+        return VehicleRoutingSolution(problem = problem, routes = routes, seed = seed)
     }
 }
 

@@ -1,6 +1,5 @@
 package vrp
 
-import localsearch.Neighbor
 import vrp.operators.*
 import java.util.*
 
