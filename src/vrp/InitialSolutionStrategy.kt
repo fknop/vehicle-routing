@@ -165,7 +165,7 @@ class RandomInitialStrategy(val seed: Long = 0) : InitialSolutionStrategy {
         }
 
 
-        return VehicleRoutingSolution(problem, routes)
+        return VehicleRoutingSolution(problem = problem, routes = routes)
     }
 }
 

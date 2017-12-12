@@ -18,7 +18,7 @@ abstract class HillClimbingSolver(val problem: VehicleRoutingProblem, val soluti
     fun next(): Boolean {
         val neighbors = neighborhood()
         if (neighbors.isNotEmpty()) {
-            val best = neighborhood().minBy { it.delta }!!
+            val best = neighborhood().filter { (it.delta + solution.totalDistance) !in solution.tabu }.minBy { it.delta }!!
 
             if (best.delta < 0) {
                 best()

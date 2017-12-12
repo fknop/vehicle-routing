@@ -4,7 +4,13 @@ import localsearch.Neighbor
 import vrp.operators.*
 import java.util.*
 
-class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: MutableList<VehicleRoute>, val seed: Long = 0L) {
+class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: MutableList<VehicleRoute>, val seed: Long = 0L, val tabu: TabuList = TabuList(keep = 10)) {
+
+    companion object {
+        fun bestOf(first: VehicleRoutingSolution, second: VehicleRoutingSolution): VehicleRoutingSolution {
+            return if (first.totalDistance < second.totalDistance) first else second
+        }
+    }
 
     val rand = Random(seed)
     var copies = 0
@@ -37,18 +43,23 @@ class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: Mut
         }
 
         copies += 1
-        return VehicleRoutingSolution(problem, routes, seed + copies)
+        return VehicleRoutingSolution(problem, routes, seed + copies, tabu = tabu)
     }
 
     fun perturb(swaps: Int = 1) {
 
         for (i in 0 until swaps) {
-            val neighbors = InterTwoOptOperator(problem, this).neighborhood() +
-                            SwapOperator(problem, this).neighborhood() +
-                            RelocateOperator(problem, this).neighborhood()
+            val neighbors = (InterTwoOptOperator(problem, this).neighborhood())
+                            .filter {
+                                val new = this.totalDistance + it.delta
+                                new !in tabu
+                            }
+
 
             val r = rand.nextInt(neighbors.size)
             neighbors[r]()
+
+            tabu += this.totalDistance
         }
     }
 
