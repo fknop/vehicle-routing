@@ -48,7 +48,7 @@ class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: Mut
     fun perturb(swaps: Int = 1) {
 
         for (i in 0 until swaps) {
-            val neighbors = (VehicleRoutingSolver(problem, this).neighborhood())
+            val neighbors = (InterTwoOptOperator(problem, this).neighborhood())
                             .filter {
                                 val new = this.totalDistance + it.delta
                                 new !in tabu

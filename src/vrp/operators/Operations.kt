@@ -151,7 +151,6 @@ fun VehicleRoute.deltaTwoOpt(i: Int, j: Int): Int {
     val newDistanceLeft = distances[customers[left].index][customers[right].index]
     val newDistanceRight = distances[customers[left + 1].index][customers[right + 1].index]
 
-
     return newDistanceLeft + newDistanceRight - distanceLeft - distanceRight
 }
 

@@ -1,5 +1,6 @@
 package vrp.search
 
+import localsearch.KOptSolver
 import localsearch.SearchStrategy
 import vrp.*
 import java.util.*
@@ -26,12 +27,14 @@ class ILSSearch(
 
             if (best != null) {
                 val solution = best.copy()
-                solution.perturb(swaps = 2 + rand.nextInt(restart+1))
-
+                solution.perturb(swaps = 2 + rand.nextInt(4))
                 solver = VehicleRoutingSolver(problem, solution)
             }
 
             solver.optimize()
+
+            val koptSolver = KOptSolver(problem, solver.solution)
+            koptSolver.optimize()
 
             if (best == null || best.totalDistance > solver.solution.totalDistance) {
                 best = solver.solution.copy()
