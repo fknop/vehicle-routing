@@ -1,6 +1,7 @@
-package vrp
+package vrp.search
 
-import printMultiple
+import localsearch.SearchStrategy
+import vrp.*
 import java.util.*
 import kotlin.system.measureTimeMillis
 
@@ -10,7 +11,7 @@ class ILSSearch(
         val maxstuck: Int = 50,
         val maxtime: Long = 20000, // 20 seconds
         val randomStart: Boolean = false
-    ) {
+    ): SearchStrategy {
 
     private fun ils(restart: Int = 0, random: Boolean = randomStart): VehicleRoutingSolution {
         var solver = VehicleRoutingSolver(problem, if (random) RandomInitialStrategy(restart.toLong()) else SweepStrategy(restart.toLong()))
@@ -52,7 +53,7 @@ class ILSSearch(
         return best!!
     }
 
-    fun search(): Pair<Long, VehicleRoutingSolution> {
+    override fun search(): Pair<Long, VehicleRoutingSolution> {
         lateinit var solution: VehicleRoutingSolution
         val time = measureTimeMillis {
             solution = ils()
