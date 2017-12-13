@@ -9,8 +9,8 @@ fun main(args: Array<String>) {
 
     val problem = VehicleRoutingProblem.fromFile(args[0])
     val maxtime = 290000L
-    val restarts = 10
-    val ils = ILSSearch(problem, restarts = restarts, maxstuck = 30, maxtime = maxtime / (restarts + 1), randomStart = false)
+    val restarts = 5
+    val ils = ILSSearch(problem, restarts = restarts, maxstuck = 100, maxtime = maxtime / (restarts + 1), randomStart = false)
     val (time, solution) = ils.search()
     print(solution)
 }

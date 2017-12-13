@@ -2,6 +2,8 @@ package vrp.search
 
 import localsearch.KOptSolver
 import localsearch.SearchStrategy
+import localsearch.heuristic.FirstBestHeuristic
+import localsearch.heuristic.HillClimbingHeuristic
 import vrp.*
 import java.util.*
 import kotlin.system.measureTimeMillis
@@ -15,7 +17,8 @@ class ILSSearch(
     ): SearchStrategy {
 
     private fun ils(restart: Int = 0, random: Boolean = randomStart): VehicleRoutingSolution {
-        var solver = VehicleRoutingSolver(problem, if (random) RandomInitialStrategy(restart.toLong()) else SweepStrategy(restart.toLong()))
+        val heuristic = FirstBestHeuristic()
+        var solver = VehicleRoutingSolver(problem, if (random) RandomInitialStrategy(restart.toLong()) else SweepStrategy(restart.toLong()), heuristic)
         var best: VehicleRoutingSolution? = null
         var stuck = 0
         val rand = Random(restart.toLong())
@@ -27,14 +30,14 @@ class ILSSearch(
 
             if (best != null) {
                 val solution = best.copy()
-                solution.perturb(swaps = 2 + rand.nextInt(4))
-                solver = VehicleRoutingSolver(problem, solution)
+                solution.perturb(swaps = 1 + rand.nextInt(3))
+                solver = VehicleRoutingSolver(problem, solution, heuristic)
             }
 
             solver.optimize()
 
-            val koptSolver = KOptSolver(problem, solver.solution)
-            koptSolver.optimize()
+//            val koptSolver = KOptSolver(problem, solver.solution)
+//            koptSolver.optimize()
 
             if (best == null || best.totalDistance > solver.solution.totalDistance) {
                 best = solver.solution.copy()
