@@ -12,8 +12,8 @@ class ILSSearch(
         val randomStart: Boolean = false
     ) {
 
-    private fun ils(restart: Int = 0): VehicleRoutingSolution {
-        var solver = VehicleRoutingSolver(problem, if (randomStart) RandomInitialStrategy(restart.toLong()) else SweepStrategy(restart.toLong()))
+    private fun ils(restart: Int = 0, random: Boolean = randomStart): VehicleRoutingSolution {
+        var solver = VehicleRoutingSolver(problem, if (random) RandomInitialStrategy(restart.toLong()) else SweepStrategy(restart.toLong()))
         var best: VehicleRoutingSolution? = null
         var stuck = 0
         val rand = Random(restart.toLong())
@@ -25,8 +25,7 @@ class ILSSearch(
 
             if (best != null) {
                 val solution = best.copy()
-                val perturbation = 10
-                solution.perturb(swaps = 10)
+                solution.perturb(swaps = 2 + rand.nextInt(restart+1))
 
                 solver = VehicleRoutingSolver(problem, solution)
             }
@@ -46,7 +45,7 @@ class ILSSearch(
 
 
         if (restart < restarts) {
-            val other = ils(restart = restart + 1)
+            val other = ils(restart = restart + 1, random = true)
             return VehicleRoutingSolution.bestOf(best!!, other)
         }
 

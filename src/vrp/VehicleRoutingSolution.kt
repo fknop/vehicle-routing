@@ -3,7 +3,7 @@ package vrp
 import vrp.operators.*
 import java.util.*
 
-class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: MutableList<VehicleRoute>, val seed: Long = 0L, val tabu: TabuList = TabuList(keep = 10)) {
+class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: MutableList<VehicleRoute>, val seed: Long = 0L, val tabu: TabuList = TabuList(keep = 30)) {
 
     companion object {
         fun bestOf(first: VehicleRoutingSolution, second: VehicleRoutingSolution): VehicleRoutingSolution {
@@ -48,7 +48,7 @@ class VehicleRoutingSolution(val problem: VehicleRoutingProblem, val routes: Mut
     fun perturb(swaps: Int = 1) {
 
         for (i in 0 until swaps) {
-            val neighbors = (InterTwoOptOperator(problem, this).neighborhood())
+            val neighbors = (VehicleRoutingSolver(problem, this).neighborhood())
                             .filter {
                                 val new = this.totalDistance + it.delta
                                 new !in tabu
