@@ -6,19 +6,21 @@ import vrp.*
 import java.util.*
 import kotlin.system.measureTimeMillis
 
-class ILSSearch(
+
+
+class SequentialSearch(
         val problem: VehicleRoutingProblem,
         val restarts: Int = 0,
         val maxstuck: Int = 50,
         val maxtime: Long = 20000, // 20 seconds
         val randomStart: Boolean = false,
         val heuristic: Heuristic
-    ): SearchStrategy {
+): SearchStrategy {
 
     private fun ils(restart: Int = 0, random: Boolean = randomStart): VehicleRoutingSolution {
 
-        val seed = 1234567L * restart
-        var solver = VehicleRoutingSolver(problem, if (random) RandomInitialStrategy(seed) else SweepStrategy(seed), heuristic)
+        val seed = /*1234567L **/ restart.toLong()
+        var solver = SequentialSolver(problem, if (random) RandomInitialStrategy(seed) else SweepStrategy(seed), heuristic)
         var best: VehicleRoutingSolution? = null
         var stuck = 0
         val rand = Random(seed)
@@ -30,14 +32,22 @@ class ILSSearch(
 
             if (best != null) {
                 val solution = best.copy()
-                solution.perturb(swaps = 1 + rand.nextInt(2))
-                solver = VehicleRoutingSolver(problem, solution, heuristic)
+                solution.perturb(swaps = 1 + rand.nextInt(4) + when {
+                    stuck > maxstuck - (maxstuck / 10) -> rand.nextInt(10)
+                    stuck > maxstuck - (maxstuck / 9) -> rand.nextInt(9)
+                    stuck > maxstuck - (maxstuck / 8) -> rand.nextInt(8)
+                    stuck > maxstuck - (maxstuck / 7) -> rand.nextInt(7)
+                    stuck > maxstuck - (maxstuck / 6) -> rand.nextInt(6)
+                    stuck > maxstuck - (maxstuck / 5) -> rand.nextInt(5)
+                    stuck > maxstuck - (maxstuck / 4) -> rand.nextInt(4)
+                    stuck > maxstuck - (maxstuck / 3) -> rand.nextInt(3)
+                    stuck > maxstuck / 2 -> rand.nextInt(2)
+                    else -> 0
+                })
+                solver = SequentialSolver(problem, solution, heuristic)
             }
 
             solver.optimize()
-
-//            val koptSolver = KOptSolver(problem, solver.solution)
-//            koptSolver.optimize()
 
             if (best == null || best.totalDistance > solver.solution.totalDistance) {
                 best = solver.solution.copy()

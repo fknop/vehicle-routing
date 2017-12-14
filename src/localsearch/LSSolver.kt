@@ -7,14 +7,18 @@ import vrp.VehicleRoutingSolution
 
 abstract class LSSolver(val problem: VehicleRoutingProblem, val solution: VehicleRoutingSolution, val heuristic: Heuristic) {
 
-    fun optimize(): Boolean {
+    open fun optimize(): Boolean {
         var improved: Boolean
+        var hasImproved: Boolean = false
 
         do {
             improved = next()
+            if (improved) {
+                hasImproved = true
+            }
         } while(improved)
 
-        return improved
+        return hasImproved
     }
 
     fun next(): Boolean {
