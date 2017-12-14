@@ -12,7 +12,7 @@ class VehicleRoutingSolver(problem: VehicleRoutingProblem, solution: VehicleRout
     override fun neighborhood(): List<Neighbor> {
       // return  TwoOptOperator(problem, solution).neighborhood() +
        return  KOptOperator(problem, solution).neighborhood() +
-//               SwapOperator(problem, solution).neighborhood() +
+               SwapOperator(problem, solution).neighborhood() +
                IntraRelocateOperator(problem, solution).neighborhood() +
                InterTwoOptOperator(problem, solution).neighborhood()
     }

@@ -3,6 +3,7 @@ package vrp.search
 import localsearch.KOptSolver
 import localsearch.SearchStrategy
 import localsearch.heuristic.FirstBestHeuristic
+import localsearch.heuristic.Heuristic
 import localsearch.heuristic.HillClimbingHeuristic
 import vrp.*
 import java.util.*
@@ -13,15 +14,17 @@ class ILSSearch(
         val restarts: Int = 0,
         val maxstuck: Int = 50,
         val maxtime: Long = 20000, // 20 seconds
-        val randomStart: Boolean = false
+        val randomStart: Boolean = false,
+        val heuristic: Heuristic
     ): SearchStrategy {
 
     private fun ils(restart: Int = 0, random: Boolean = randomStart): VehicleRoutingSolution {
-        val heuristic = FirstBestHeuristic()
-        var solver = VehicleRoutingSolver(problem, if (random) RandomInitialStrategy(restart.toLong()) else SweepStrategy(restart.toLong()), heuristic)
+
+        val seed = 1234567L * restart
+        var solver = VehicleRoutingSolver(problem, if (random) RandomInitialStrategy(seed) else SweepStrategy(seed), heuristic)
         var best: VehicleRoutingSolution? = null
         var stuck = 0
-        val rand = Random(restart.toLong())
+        val rand = Random(seed)
 
         val startTime = System.currentTimeMillis()
         var elapsed = 0L
@@ -30,7 +33,7 @@ class ILSSearch(
 
             if (best != null) {
                 val solution = best.copy()
-                solution.perturb(swaps = 1 + rand.nextInt(3))
+                solution.perturb(swaps = 1 + rand.nextInt(2))
                 solver = VehicleRoutingSolver(problem, solution, heuristic)
             }
 
