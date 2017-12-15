@@ -15,9 +15,17 @@ fun main(args: Array<String>) {
     val problem = VehicleRoutingProblem.fromFile(args[0])
     val maxtime = 290000L
     val restarts = 0
+
+//    val init = SweepStrategy().getInitialSolution(problem)
+//    print(init)
+//
+//    val solver = VehicleRoutingSolver(problem, init, HillClimbingHeuristic())
+//    solver.optimize()
+//    print(solver.solution)
+
     val ils = SequentialSearch(
             problem = problem,
-            restarts = restarts, maxstuck = 600, maxtime = maxtime / (restarts + 1),
+            restarts = restarts, maxstuck = 200, maxtime = maxtime / (restarts + 1),
             randomStart = false,
             heuristic = HillClimbingHeuristic()
         )

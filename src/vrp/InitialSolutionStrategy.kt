@@ -24,22 +24,28 @@ class SweepStrategy(val seed: Long = 0L) : InitialSolutionStrategy {
             route
         }
 
+        var currentRoute = 0
         var angle = 0.0
-        var servedCustomers = mutableSetOf<Int>()
+        val servedCustomers = mutableSetOf<Int>()
 
         while (angle < 360.0 && servedCustomers.size != customers.size) {
             val slope = tan(radians(angle))
             var add = false
 
-            customers.filter {
-                it.index !in servedCustomers
+            customers.filterNot {
+                it.index in servedCustomers
             }.forEach {
                 val (_, _, x, y) = it
-                val above = y >= (x * slope)
-                val below = y <= (x * slope)
+                val above = y > (x * slope)
+                val below = y < (x * slope)
 
-                if (angle >= .0 && angle < 90.0) {
-                    if (x >= 0 && y >= 0 && below) {
+                if (angle == .0) {
+                    if (x > .0 && y == .0) {
+                        add = true
+                    }
+                }
+                else if (angle > .0 && angle < 90.0) {
+                    if (x > .0 && y > .0 && below) {
                         add = true
                     }
                 }
@@ -68,19 +74,31 @@ class SweepStrategy(val seed: Long = 0L) : InitialSolutionStrategy {
                         add = true
                     }
                 }
-                else if (angle > 270.0 && angle <= 360) {
+                else if (angle > 270.0 && angle < 360) {
                     if (x >= .0 && y <= .0 && below) {
                         add = true
                     }
                 }
 
                 if (add) {
-                    for (route in routes) {
-                        if (route.addCustomer(it, route.customers.size - 1)) {
-                            servedCustomers.add(it.index)
-                            break
+                    val r = routes[currentRoute]
+                    if (r.addCustomer(it, r.customers.size - 1)) {
+                            servedCustomers += it.index
+                    }
+                    else {
+                        currentRoute++
+                        for (i in currentRoute - 1 downTo 0) {
+                            val route = routes[i]
+                            if (route.addCustomer(it, route.customers.size - 1)) {
+                                servedCustomers += it.index
+                                break
+                            }
+
                         }
                     }
+
+//                    for (route in routes) {
+//                    }
                 }
             }
 
@@ -94,7 +112,7 @@ class SweepStrategy(val seed: Long = 0L) : InitialSolutionStrategy {
     }
 }
 
-class SimpleInitialStrategy : InitialSolutionStrategy {
+class SimpleInitialStrategy(val seed: Long = 0) : InitialSolutionStrategy {
     override fun getInitialSolution(problem: VehicleRoutingProblem): VehicleRoutingSolution {
         val customers = problem.customers
                 .subList(1, problem.customers.size) // remove warehouse
@@ -127,7 +145,7 @@ class SimpleInitialStrategy : InitialSolutionStrategy {
         }
 
 
-        return VehicleRoutingSolution(problem, routes)
+        return VehicleRoutingSolution(problem, routes, seed)
     }
 }
 

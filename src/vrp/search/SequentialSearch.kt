@@ -19,7 +19,7 @@ class SequentialSearch(
 
     private fun ils(restart: Int = 0, random: Boolean = randomStart): VehicleRoutingSolution {
 
-        val seed = /*1234567L **/ restart.toLong()
+        val seed = restart.toLong()
         var solver = SequentialSolver(problem, if (random) RandomInitialStrategy(seed) else SweepStrategy(seed), heuristic)
         var best: VehicleRoutingSolution? = null
         var stuck = 0
@@ -33,12 +33,6 @@ class SequentialSearch(
             if (best != null) {
                 val solution = best.copy()
                 solution.perturb(swaps = 1 + rand.nextInt(4) + when {
-                    stuck > maxstuck - (maxstuck / 10) -> rand.nextInt(10)
-                    stuck > maxstuck - (maxstuck / 9) -> rand.nextInt(9)
-                    stuck > maxstuck - (maxstuck / 8) -> rand.nextInt(8)
-                    stuck > maxstuck - (maxstuck / 7) -> rand.nextInt(7)
-                    stuck > maxstuck - (maxstuck / 6) -> rand.nextInt(6)
-                    stuck > maxstuck - (maxstuck / 5) -> rand.nextInt(5)
                     stuck > maxstuck - (maxstuck / 4) -> rand.nextInt(4)
                     stuck > maxstuck - (maxstuck / 3) -> rand.nextInt(3)
                     stuck > maxstuck / 2 -> rand.nextInt(2)
